@@ -1,37 +1,38 @@
 <template>
-    <v-container class="form-container">
-      <v-form @submit.prevent="submitForm" v-model="valid">
-        <v-row class="form-item">
-          <v-col cols="12" md="5">
-            <v-autocomplete 
+  <v-container class="form-container">
+    <v-form @submit.prevent="submitForm" v-model="valid">
+      <v-row class="form-item">
+        <v-col cols="12" md="5">
+          <v-autocomplete 
             v-model="formData.vehicle" 
             label="Kiralanacak Araç" 
             :items="vehicles"
             item-title="plateNumber"
             item-value="_id"
-            ></v-autocomplete>
-          </v-col>
-          <v-col cols="12" md="5">
-            <v-autocomplete 
+          ></v-autocomplete>
+        </v-col>
+        <v-col cols="12" md="5">
+          <v-autocomplete 
             v-model="formData.renter" 
             label="Kiralayacak Kişi" 
             :items="renters"
             item-title="name"
             item-value="_id" 
-            ></v-autocomplete>
-          </v-col>
-        </v-row>
-        <v-row class="form-item">
-          <v-col cols="12" md="6">
-            <v-date-picker v-model="formData.startDate" label="Başlangıç Tarihi" :min="minStartDate" :max="maxStartDate"   required></v-date-picker>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-date-picker v-model="formData.endDate" label="Bitiş Tarihi" :min="minEndDate" :max="maxEndDate" required ></v-date-picker>
-          </v-col>
-        </v-row>
-        <v-btn class="button" type="submit" color="primary" :disabled="!valid">Kaydet</v-btn>
-      </v-form>
-      <v-dialog v-model="successDialog" max-width="300">
+          ></v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row class="form-item">
+        <v-col cols="12" md="6">
+          <v-date-picker v-model="formData.startDate" label="Başlangıç Tarihi" required></v-date-picker>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-date-picker v-model="formData.endDate" label="Bitiş Tarihi" required ></v-date-picker>
+        </v-col>
+      </v-row>
+      <v-btn class="button" type="submit" color="primary" :disabled="!valid">Kaydet</v-btn>
+    </v-form>
+
+    <v-dialog v-model="successDialog" max-width="300">
       <v-card>
         <v-card-title class="headline">İşlem Başarılı!</v-card-title>
         <v-card-text>
@@ -42,7 +43,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    </v-container>
+    
+    <v-dialog v-model="errorDialog" max-width="300">
+      <v-card>
+        <v-card-title class="headline">İşlem Başarısız!</v-card-title>
+          <v-card-text>
+           Seçtiğiniz araç seçilen tarihlerde kiralanmıştır, lütfen başka tarih seçin.
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="error" @click="closeDialog">Kapat</v-btn>
+          </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>
@@ -61,6 +74,7 @@ export default {
       renters: [],
       valid: false,
       successDialog: false,
+      errorDialog: false,
       minStartDate: null,
       maxStartDate: null,
       minEndDate: null,
@@ -69,15 +83,6 @@ export default {
   },
   mounted() {
     this.fetchVehiclesAndRenters();
-  },
-  watch: {
-    'formData.vehicle': function(newValue) {
-      if(newValue) {
-        this.fetchRentalDatesForVehicle(newValue);
-      } else {
-        this.resetDateConstraints();
-      }
-    }
   },
   methods: {
     async fetchVehiclesAndRenters() {
@@ -90,51 +95,56 @@ export default {
         console.error('Araç ve kiracı verileri alınırken bir hata oluştu:', error);
       }
     },
-    async fetchRentalDatesForVehicle(vehicleId) {
+    async isRentalDateConflict(vehicleId, startDate, endDate) {
       try {
+
         const response = await axios.get(`http://localhost:3000/rental`);
         const rentals = response.data;
 
         const vehicleRentals = rentals.filter(rental => rental.vehicle === vehicleId);
 
-        console.log(vehicleRentals);
 
-        const startDateList = vehicleRentals.map(rental => new Date(rental.startDate));
-        const endDateList = vehicleRentals.map(rental => new Date(rental.endDate));
+        const newStartDate = new Date(startDate);
+        const newEndDate = new Date(endDate);
 
-        this.minStartDate = new Date(Math.min(...startDateList));
-        this.maxStartDate = new Date(Math.max(...endDateList));
-        this.minEndDate = new Date(Math.min(...startDateList));
-        this.maxEndDate = new Date(Math.max(...endDateList));
-        
-        console.log(this.minStartDate);
-        console.log(this.maxStartDate);
-        console.log(this.minEndDate);
-        console.log(this.maxEndDate); 
-        console.log("oldu");
+        for (const rental of vehicleRentals) {
+            const rentalStartDate = new Date(rental.startDate);
+            const rentalEndDate = new Date(rental.endDate);
+
+            if (
+                (newStartDate >= rentalStartDate && newStartDate <= rentalEndDate) ||
+                (newEndDate >= rentalStartDate && newEndDate <= rentalEndDate) ||
+                (rentalStartDate >= newStartDate && rentalStartDate <= newEndDate) ||
+                (rentalEndDate >= newStartDate && rentalEndDate <= newEndDate)
+            ) {
+                return true;
+            }
+        }
+        return false;
 
       } catch (error) {
-        console.error('Araç kiralama verileri alınırken bir hata oluştu:', error);
+        console.error('Kiralama tarihleri kontrol edilirken bir hata oluştu:', error);
+        return true;
       }
-    },
-    resetDateConstraints() {
-      // Kısıtlamaları sıfırla
-      this.minStartDate = null;
-      this.maxStartDate = null;
-      this.minEndDate = null;
-      this.maxEndDate = null;
     },
     async submitForm() {
       console.log('Form verileri:', this.formData);
       try {
-        const response = await axios.post('http://localhost:3000/rental', this.formData);
 
-        if (response.status === 200) {
+        const conflict = await this.isRentalDateConflict(this.formData.vehicle, this.formData.startDate, this.formData.endDate);
+
+        if (conflict) {
+          this.errorDialog = true;
+        } else {
+          const response = await axios.post('http://localhost:3000/rental', this.formData);
+
+          if (response.status === 200) {
           console.log('Veri başarıyla gönderildi!');
           this.successDialog = true;
           this.resetForm();
         } else {
           console.error('Veri gönderilirken bir hata oluştu.');
+          }
         }
       } catch (error) {
         console.error('Bir hata oluştu:', error);
@@ -150,6 +160,7 @@ export default {
     },
     closeDialog() {
       this.successDialog = false;
+      this.errorDialog = false;
     }
   }
 };
@@ -172,7 +183,7 @@ export default {
 .form-item {
   margin-bottom: 10px;
 }
-.button{
+.button {
   width: 300px;
 }
 </style>
