@@ -31,7 +31,7 @@ export default {
 }
 
 .container {
-  max-width: 75%; /* veya istediğiniz bir değer */
+  max-width: 75%;
 }
 
 </style>
