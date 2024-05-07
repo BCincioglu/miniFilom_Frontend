@@ -14,7 +14,6 @@
 
 
 <script>
-import Modal from '@/components/ModalFormVehicle.vue'
 
 export default {
   name: 'Hello'
