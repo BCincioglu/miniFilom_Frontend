@@ -52,10 +52,10 @@ export default {
             vehicle: vehicleResponse.data.plateNumber,
             renter: renterResponse.data.name
           };
-        }));
-      } catch (error) {
-        console.error('Bir hata oluştu:', error);
-      }
+      }));
+    } catch (error) {
+      console.error('Bir hata oluştu:', error);
+    }
     },
     formatDate(dateString) {
       return moment(String(dateString)).format('DD/MM/YYYY');

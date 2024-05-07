@@ -71,11 +71,20 @@ export default {
     },
     methods: {
         async fetchRenters() {
-            try {
+            try { 
                 const response = await axios.get("http://localhost:3000/renter");
-                this.renters = response.data;
-            }
-            catch (error) {
+                this.renters = await Promise.all(response.data.map(async (renter) => {
+                if (renter.vehiclesRented) {
+                  const vehicleResponse = await axios.get(`http://localhost:3000/vehicle/${renter.vehiclesRented}`);
+                  return {
+                    ...renter,
+                    vehiclesRented: vehicleResponse.data.plateNumber
+                  };
+                  } else {
+                    return renter; 
+                  };
+                  }));
+            } catch (error) {
                 console.error("Bir hata oluştu:", error);
             }
         },
