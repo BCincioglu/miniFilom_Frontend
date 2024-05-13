@@ -8,22 +8,15 @@
       <v-select v-model="formData.type" :items="types" label="Tür" required></v-select>
       <v-btn type="submit" color="primary">Kaydet</v-btn>
     </v-form>
-    <v-dialog v-model="successDialog" max-width="300">
-      <v-card>
-        <v-card-title class="headline">İşlem Başarılı!</v-card-title>
-        <v-card-text>
-          Veri başarıyla gönderildi.
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="closeDialog">Tamam</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+
+    <NewComponent :successDialog="successDialog" :closeDialog="closeDialog" />
+
   </v-container>
 </template>
 
 <script>
 import axios from 'axios';
+import NewComponent from './NewComponent.vue'
 
 export default {
   data() {
@@ -44,8 +37,7 @@ export default {
   methods: {
     async submitForm() {
       try {
-        console.log(this.formData)
-        const response = await axios.post('http://localhost:3000/formData', this.formData);
+        const response = await axios.post('http://localhost:3000/renter', this.formData);
         
         if (response.status === 200) {
           console.log('Veri başarıyla gönderildi!');
@@ -72,7 +64,8 @@ export default {
     closeDialog() {
       this.successDialog = false; 
     }
-  }
+  },
+  components: { NewComponent }
 };
 </script>
 

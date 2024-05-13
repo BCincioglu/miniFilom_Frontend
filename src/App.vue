@@ -27,6 +27,11 @@
           </v-list-tile>
         </router-link>
       </v-list>
+
+      <v-btn @click="logout" block color="grey" dark>
+        <v-icon left>mdi-logout</v-icon>
+        Logout
+      </v-btn>
     </v-navigation-drawer>
 
     <v-main>
@@ -37,6 +42,9 @@
 </template>
 
 <script>
+import axios from 'axios';
+
+
 export default {
   data () {
     return {
@@ -48,15 +56,13 @@ export default {
         { title: 'Kiracı Tablosu', icon: 'mdi-account-multiple', path: '/renters' },
         { title: 'Kiralama Formu', icon: 'mdi-file', path: '/rental' },
         { title: 'Kiralama Tablosu', icon: 'mdi-file-multiple', path: '/rentals' },
-        
-        
       ],
       right: null
     }
   },
   methods: {
-    navigate(item) {
-      console.log("Yönlendirme: ", item.title);
+    logout() {
+      delete axios.defaults.headers.common['Authorization'];
     }
   }
 }
