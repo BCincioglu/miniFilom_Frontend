@@ -1,5 +1,5 @@
 <template>
-    <v-container class="login-container">
+    <v-container class="login-container" v-if="!loggedIn">
       <v-card>
         <v-card-title class="headline">Giriş Yap</v-card-title>
         <v-card-text>
@@ -25,7 +25,8 @@
       return {
         username: '',
         password: '',
-        errorMessage: ''
+        errorMessage: '',
+        loggedIn: false,
       };
     },
     methods: {
@@ -36,6 +37,8 @@
             password: this.password
           });
           const token = response.data.token;
+          this.$emit('basarili');
+          this.loggedIn = true;
           axios.defaults.headers.common['Authorization'] = `${token}`;
           this.$router.push('/')
         } catch (error) {
@@ -47,9 +50,9 @@
   };
   </script>
   
-  <style>
+  <style scoped>
   .login-container {
-    max-width: 400px;
+    max-width: 55%;
     margin: auto;
     padding-top: 50px;
   }
@@ -60,7 +63,6 @@
     text-align: right;
   }
   .btn {
-    padding-left: 40%;
+    width: 100%;
   }
   </style>
-  

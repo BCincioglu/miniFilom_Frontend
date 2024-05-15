@@ -34,19 +34,20 @@
     </v-navigation-drawer>
 
     <v-main>
-      <router-view/>
+      <router-view @basarili="drawer=true"/>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios';
+import FormLogin from '@/components/FormLogin.vue';
 
 
 export default {
   data () {
     return {
-      drawer: true,
+      drawer: false,
       items: [
         { title: 'Araç Formu', icon: 'mdi-car', path: '/vehicle' },
         { title: 'Araç Tablosu', icon: 'mdi-car-multiple', path: '/vehicles' },
@@ -61,9 +62,13 @@ export default {
   methods: {
     logout() {
       delete axios.defaults.headers.common['Authorization'];
-      this.$router.push('/login');
+      this.drawer= false;
+      this.$router.push('/');
     }
   },
+  components: {
+    FormLogin
+  }
 }
 </script>
 
