@@ -6,6 +6,8 @@ import Hello from '@/components/Hello.vue';
 import TableRental from '@/components/TableRental.vue';
 import TableRenter from '@/components/TableRenter.vue';
 import TableVehicle from '@/components/TableVehicle.vue';
+import FormLogin from '@/components/FormLogin.vue';
+
 
 const routes = [
   { path: '/rental', component: FormRental },
@@ -15,6 +17,7 @@ const routes = [
   { path: '/rentals', component: TableRental },
   { path: '/renters', component: TableRenter },
   { path: '/vehicles', component: TableVehicle },
+  { path: '/login', component: FormLogin },
 ];
 
 const router = createRouter({

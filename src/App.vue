@@ -1,10 +1,10 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" permenant :width="200">
+    <v-navigation-drawer v-model="drawer" permanent :width="200">
       <v-toolbar flat>
         <v-list>
           <v-list-tile>
-            <v-list-tile-title class="title" >
+            <v-list-tile-title class="title">
               <router-link to="/">Mini Filom</router-link>
             </v-list-tile-title>
           </v-list-tile>
@@ -19,7 +19,6 @@
             <v-list-tile-action>
               <v-icon size="18" class="liste">{{ item.icon }}</v-icon>
             </v-list-tile-action>
-
             <v-list-tile-content>
               <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               <v-divider class="custom-divider"></v-divider>
@@ -37,7 +36,6 @@
     <v-main>
       <router-view/>
     </v-main>
-
   </v-app>
 </template>
 
@@ -57,14 +55,15 @@ export default {
         { title: 'Kiralama Formu', icon: 'mdi-file', path: '/rental' },
         { title: 'Kiralama Tablosu', icon: 'mdi-file-multiple', path: '/rentals' },
       ],
-      right: null
+      right: null,
     }
   },
   methods: {
     logout() {
       delete axios.defaults.headers.common['Authorization'];
+      this.$router.push('/login');
     }
-  }
+  },
 }
 </script>
 
