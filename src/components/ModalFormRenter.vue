@@ -1,5 +1,5 @@
 <template>
-	<v-dialog v-model="editModal" max-width="500">
+	<v-dialog v-model="editModal" max-width="500" max-height="750">
 	      <v-card>
 	        <v-card-title class="title">
 	          Kiracı Düzenle
