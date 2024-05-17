@@ -41,7 +41,7 @@
 
 <script>
 import axios from 'axios';
-import FormLogin, { routePass }  from '@/components/FormLogin.vue';
+import FormLogin, { setRoutePass } from '@/components/FormLogin.vue';
 
 
 export default {
@@ -64,7 +64,7 @@ export default {
       delete axios.defaults.headers.common['Authorization'];
       this.drawer= false;
       this.$router.push('/');
-      routePass = false;
+      setRoutePass(false);
     }
   },
   components: {
