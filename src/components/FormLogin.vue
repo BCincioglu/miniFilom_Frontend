@@ -18,6 +18,8 @@
   
   <script>
   import axios from 'axios';
+
+  export let routePass = false;
   
   export default {
     name: 'Login',
@@ -38,7 +40,7 @@
           });
           const token = response.data.token;
           this.$emit('basarili');
-          this.loggedIn = true;
+          routePass = true;
           axios.defaults.headers.common['Authorization'] = `${token}`;
           this.$router.push('/')
         } catch (error) {
