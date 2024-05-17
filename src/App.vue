@@ -55,6 +55,7 @@ export default {
         { title: 'Kiracı Tablosu', icon: 'mdi-account-multiple', path: '/renters' },
         { title: 'Kiralama Formu', icon: 'mdi-file', path: '/rental' },
         { title: 'Kiralama Tablosu', icon: 'mdi-file-multiple', path: '/rentals' },
+        { title: 'Harita', icon: 'mdi-google-maps', path: '/map' },
       ],
       right: null,
     }
