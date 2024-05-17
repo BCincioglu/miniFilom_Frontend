@@ -27,9 +27,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (!routePass && to.path !== '/' && to.path !== '/login') {
-    next('/login'); // Eğer routePass false ise ve kullanıcı yetkisiz bir rotaya gitmek istiyorsa /login'e yönlendir
+    next('/login'); 
   } else {
-    next(); // Aksi halde normal devam et
+    next();
   }
 });
 
