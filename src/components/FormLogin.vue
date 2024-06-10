@@ -33,6 +33,7 @@
         password: '',
         errorMessage: '',
         loggedIn: false,
+        token: ''
       };
     },
     methods: {
@@ -43,6 +44,7 @@
             password: this.password
           });
           const token = response.data.token;
+          localStorage.setItem('token', token);
           this.$emit('basarili');
           setRoutePass(true);
           axios.defaults.headers.common['Authorization'] = `${token}`;

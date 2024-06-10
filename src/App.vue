@@ -66,6 +66,7 @@ export default {
       this.drawer= false;
       this.$router.push('/');
       setRoutePass(false);
+      localStorage.clear();
     }
   },
   components: {

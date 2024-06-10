@@ -4,7 +4,7 @@
     <v-data-table
       :headers="headers"
       :items="vehicles"
-      :items-per-page="10"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       item-key="plateNumber"
     >
@@ -21,6 +21,7 @@
         </tr>
       </template>
     </v-data-table>
+
 
     <ModalFormVehicle :submitForm="submitForm" :formData="formData" v-model:editModal="editModal" />
 
@@ -42,6 +43,8 @@
 <script>
 import axios from 'axios';
 import ModalFormVehicle from './ModalFormVehicle.vue'
+
+const itemsPerPage = 10;
 
 export default {
     data() {
@@ -77,8 +80,8 @@ export default {
     methods: {
         async getAllVehicles() {
             try {
-                const response = await axios.get("http://localhost:3000/vehicle");
-                this.vehicles = response.data;
+                const response = await axios.get(`http://localhost:3000/vehicle`);
+                this.vehicles = Array.isArray(response.data) ? response.data : []; // Eğer veri bir dizi içinde değilse
             }
             catch (error) {
                 console.error("Araçlar alınırken bir hata oluştu:", error);
