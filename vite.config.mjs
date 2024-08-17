@@ -44,4 +44,7 @@ export default defineConfig({
   server: {
     port: 3030,
   },
+  build: {
+    sourcemap: false, // Production source map'i etkinleştirir
+  },
 })

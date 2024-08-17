@@ -10,7 +10,7 @@
       >
         <template v-slot:item="{ item }">
           <tr class="custom-row">
-            <td>{{ item.vehicle }}</td>
+            <td>{{ item.plateNumber }}</td>
             <td>{{ item.renter }}</td>
             <td>{{ formatDate(item.startDate) }}</td>
             <td>{{ formatDate(item.endDate) }}</td>
@@ -43,19 +43,11 @@ export default {
   methods: {
     async fetchRentals() {
       try {
-        const response = await axios.get('http://localhost:3000/rental');
-        this.rentals = await Promise.all(response.data.map(async (rental) => {
-          const vehicleResponse = await axios.get(`http://localhost:3000/vehicle/${rental.vehicle}`);
-          const renterResponse = await axios.get(`http://localhost:3000/renter/${rental.renter}`);
-          return {
-            ...rental,
-            vehicle: vehicleResponse.data.plateNumber,
-            renter: renterResponse.data.name
-          };
-        }));
-      } catch (error) {
-        console.error('Bir hata oluştu:', error);
-      }
+        const response = await axios.get('http://localhost:3000/rental/aggre');
+        this.rentals = response.data;
+    } catch (error) {
+      console.error('Bir hata oluştu:', error);
+    }
     },
     formatDate(dateString) {
       return moment(String(dateString)).format('DD/MM/YYYY');

@@ -1,28 +1,33 @@
 <template>
-
   <v-container class="container">
     <v-layout align-center justify-center class="welcome-content">
       <v-flex xs12>
-        <h1 class="display-1 text-center">Hoş Geldiniz!</h1>
+        <v-btn variant="text" class="Merhaba" @click="goToLogin">HOŞ GELDİNİZ!</v-btn>
         <p class="body-1 text-center">Bu uygulama, araç kiralama işlemlerini yönetebilmeniz için tasarlanmıştır.</p>
       </v-flex>
     </v-layout>
   </v-container>
-  
-
 </template>
 
-
 <script>
-import Modal from '@/components/ModalFormVehicle.vue'
-
 export default {
-  name: 'Hello'
-
+  name: 'Hello',
+  methods: {
+    goToLogin() {
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
-<style scoped>
+<style>
+.headline {
+  align-self: center;
+}
+
+.btn {
+  align-self: center;
+}
 
 .welcome-content {
   position: absolute;
@@ -31,10 +36,13 @@ export default {
   text-align: center;
 }
 
-.container {
-  max-width: 75%; /* veya istediğiniz bir değer */
+.Merhaba {
+  text-align: center;
+  font-size: 2.25rem;
+  padding-bottom: 15%;
 }
 
+.container {
+  max-width: 75%;
+}
 </style>
-
-

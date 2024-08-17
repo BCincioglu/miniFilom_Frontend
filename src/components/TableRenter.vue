@@ -19,36 +19,7 @@
       </template>
     </v-data-table>
 
-    <v-dialog v-model="editModal" max-width="500">
-      <v-card>
-        <v-card-title class="title">
-          Kiracı Düzenle
-        </v-card-title>
-        <v-card-text>
-          <v-form ref="form" @submit.prevent="submitForm" class="renter-form">
-              <v-col cols="16" sm="12">      
-                <v-text-field v-model="editFormData.name" label="Adı" required></v-text-field>
-              </v-col>
-              <v-col cols="16" sm="12">
-                <v-text-field v-model="editFormData.contact.phone" label="Telefon" required></v-text-field>
-              </v-col>
-              <v-col cols="16" sm="12">
-                <v-text-field v-model="editFormData.contact.email" label="E-posta" required></v-text-field>
-              </v-col>
-              <v-col cols="16" sm="12">
-                <v-text-field v-model="editFormData.contact.address" label="Adres" required></v-text-field>
-              </v-col>
-              <v-col cols="16" sm="12">
-                <v-select v-model="editFormData.type" :items="types" label="Tür" required></v-select>
-              </v-col>
-              <v-card-actions class="text-right">
-              <v-btn type="submit" color="primary">Kaydet</v-btn>
-              <v-btn @click="editModal = false" color="error">İptal</v-btn>
-             </v-card-actions>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <ModalFormRenter :submitForm="submitForm" :editFormData="editFormData" :types="types" v-model:editModal="editModal" />
 
     <v-dialog v-model="successDialog" max-width="300">
       <v-card>
@@ -66,83 +37,96 @@
 
 <script>
 import axios from 'axios';
+import ModalFormRenter from './ModalFormRenter.vue'
 
 export default {
-  data() {
-    return {
-      renters: [],
-      headers: [
-        { text: 'Adı', value: 'name' },
-        { text: 'Telefon', value: 'contact.phone' },
-        { text: 'E-posta', value: 'contact.email' },
-        { text: 'Adres', value: 'contact.address' },
-        { text: 'Tür', value: 'type' },
-        { text: 'Kiralanan Araç', value: 'vehiclesRented' }
-      ],
-      editFormData: {
-        name: '',
-        contact: {
-          phone: '',
-          email: '',
-          address: ''
+    data() {
+        return {
+            renters: [],
+            headers: [
+                { text: "Adı", value: "name" },
+                { text: "Telefon", value: "contact.phone" },
+                { text: "E-posta", value: "contact.email" },
+                { text: "Adres", value: "contact.address" },
+                { text: "Tür", value: "type" },
+                { text: "Kiralanan Araç", value: "vehiclesRented" }
+            ],
+            editFormData: {
+                name: "",
+                contact: {
+                    phone: "",
+                    email: "",
+                    address: ""
+                },
+                type: "",
+                vehiclesRented: "",
+            },
+            successDialog: false,
+            editModal: false,
+            types: ["Bireysel", "Şirket"]
+        };
+    },
+    mounted() {
+        this.fetchRenters();
+    },
+    methods: {
+        async fetchRenters() {
+            try { 
+                const response = await axios.get("http://localhost:3000/renter");
+                this.renters = await Promise.all(response.data.map(async (renter) => {
+                if (renter.vehiclesRented) {
+                  const vehicleResponse = await axios.get(`http://localhost:3000/vehicle/${renter.vehiclesRented}`);
+                  return {
+                    ...renter,
+                    vehiclesRented: vehicleResponse.data.plateNumber
+                  };
+                  } else {
+                    return renter; 
+                  };
+                  }));
+            } catch (error) {
+                console.error("Bir hata oluştu:", error);
+            }
         },
-        type: '',
-        vehiclesRented:'',
-      },
-      successDialog: false,
-      editModal: false,
-      types: ['Bireysel', 'Şirket']
-    };
-  },
-  mounted() {
-    this.fetchRenters();
-  },
-  methods: {
-    async fetchRenters() {
-      try {
-        const response = await axios.get('http://localhost:3000/renter');
-        this.renters = response.data;
-      } catch (error) {
-        console.error('Bir hata oluştu:', error);
-      }
-    },
-    openEditModal(item) {
-      this.editFormData = { ...item };
-      this.editModal = true;
-    },
-    async submitForm() {
-      console.log('Gönderilen Kişi:', this.editFormData);
-      try {
-        const response = await axios.post(`http://localhost:3000/renter/${this.editFormData._id}`, this.editFormData);
-
-        if (response.status === 200) {
-          console.log('Veri başarıyla gönderildi!');
-          this.successDialog = true;
-          this.resetForm();
-          this.fetchRenters();
-        } else {
-          console.error('Veri gönderilirken bir hata oluştu.');
+        openEditModal(item) {
+            this.editFormData = { ...item };
+            this.editModal = true;
+        },
+        async submitForm() {
+            console.log("Gönderilen Kişi:", this.editFormData);
+            try {
+                const response = await axios.post(`http://localhost:3000/renter/${this.editFormData._id}`, this.editFormData);
+                if (response.status === 200) {
+                    console.log("Veri başarıyla gönderildi!");
+                    this.successDialog = true;
+                    this.resetForm();
+                    this.fetchRenters();
+                }
+                else {
+                    console.error("Veri gönderilirken bir hata oluştu.");
+                }
+                this.editModal = false;
+            }
+            catch (error) {
+                console.error("Araç güncellenirken bir hata oluştu:", error);
+            }
+        },
+        resetForm() {
+            this.editFormData = {
+                name: "",
+                contact: {
+                    phone: "",
+                    email: "",
+                    address: ""
+                },
+                type: ""
+            };
+        },
+        closeDialog() {
+            this.successDialog = false;
         }
-        this.editModal=false;
-      } catch (error) {
-        console.error('Araç güncellenirken bir hata oluştu:', error);
-      } 
     },
-    resetForm() {
-      this.editFormData = {
-        name: '',
-        contact: {
-          phone: '',
-          email: '',
-          address: ''
-        },
-        type: ''
-      };
-    },
-    closeDialog() {
-      this.successDialog = false; 
-    }
-  }
+    components: { ModalFormRenter }
 };
 </script>
 
