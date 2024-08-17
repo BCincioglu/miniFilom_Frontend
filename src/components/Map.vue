@@ -39,28 +39,33 @@ export default {
       token: '',
       locations: [],
       center: { lat: 39.925533, lng: 34.836944 },
-      socket: null
+      socket: null,
+      room: null,
     };
   },
   mounted() {
     this.token = localStorage.getItem('token');
-    const SOCKET_URL = "http://localhost:3339?room=carGroup2";
+    const SOCKET_URL = `http://localhost:3339?token=${this.token}`;
     this.socket = io(SOCKET_URL);
 
-    // Konum güncellemelerini dinle
-    this.socket.on('carGroup2LocationUpdate', (data) => {
-      if (data && data.length > 0) {
-        this.locations = data.map(location => ({
-          lat: location.lat,
-          lng: location.lng
-        }));
-      }
-      console.log('Gelen konum bilgisi->', this.locations);
+    this.socket.on("roomInfo", (room) => {
+      this.room = room;
+      console.log("Oda bilgisi alındı:", room);
+      // Konum güncellemelerini dinle
+      this.socket.on('locationUpdate', (data) => {
+        if (data && data.length > 0) {
+          this.locations = data.map(location => ({
+            lat: location.lat,
+            lng: location.lng
+          }));
+          console.log('Gelen konum bilgisi->', this.locations);
+        }
+      });
     });
   },
   beforeUnmount() {
     if (this.socket) {
-      this.socket.off('carGroup2LocationUpdate');
+      this.socket.off('locationUpdate');
     }
   },
 };
